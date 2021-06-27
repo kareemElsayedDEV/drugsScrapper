@@ -9,13 +9,29 @@ class PostsSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        for post in response.css('div.post-item'):
-            yield {
-                'title': post.css('.post-header h2 a::text')[0].get(),
-                'date': post.css('.post-header a::text')[1].get(),
-                'author': post.css('.post-header a::text')[2].get()
-            }
-        next_page = response.css('a.next-posts-link::attr(href)').get()
+        for post in response.css('div.cm-item'):
+            details = post.css('.cm-details::attr(href)').get()
+            yield from response.follow_all(details, self.parseDrugItem)
+            
+        next_page = response.css('a.page-link::attr(href)')[-1].get()
         if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback=self.parse)
+            yield from response.follow_all(next_page, callback=self.parse)
+           
+    def parseDrugItem(self, response):
+        yield {
+            'img': response.css('img.img-fluid::attr(src)').get(),
+            'name': response.css('div.mid-snipp h1::text').get(),
+            'name_retail': response.css('div.even::text')[1].get(),
+            'name_scientific': response.css('div.odd::text')[3].get(),
+            'price': response.css('p.m-price::text').get(),
+            'desc_ar': response.css('div#arabic-desc::text').getall(),
+            'desc_en': response.css('div#english-desc::text').getall()
+        }
+        producers = ""
+        for producer in response.css('div.even a::text'):
+            producers=producers+ producer
+            
+        yield {
+            'manufacturers': producers
+        }
+                
