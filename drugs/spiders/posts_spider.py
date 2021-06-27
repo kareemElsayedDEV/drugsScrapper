@@ -18,9 +18,10 @@ class PostsSpider(scrapy.Spider):
             yield from response.follow_all(next_page, callback=self.parse)
            
     def parseDrugItem(self, response):
-        name_retail = response.css('div.even::text')[1].get()
-        if name_retail is None:
-            name_retail = '';
+        name_retail_container = response.css('div.even::text')
+        name_retail = ""
+        if name_retail_container:
+            name_retail = name_retail_container[1].get()
         yield {
             'img': response.css('img.img-fluid::attr(src)').get(),
             'name': response.css('div.mid-snipp h1::text').get(),
