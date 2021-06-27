@@ -11,11 +11,12 @@ class PostsSpider(scrapy.Spider):
     def parse(self, response):
         for post in response.css('div.cm-item'):
             details = post.css('.cm-details::attr(href)').get()
-            yield from response.follow_all(details, self.parseDrugItem)
+            details = response.urljoin(details)
+            yield scrapy.Request(details, self.parseDrugItem)
             
         next_page = response.css('a.page-link::attr(href)')[-1].get()
         if next_page is not None:
-            yield from response.follow_all(next_page, callback=self.parse)
+            yield scrapy.Request(next_page, callback=self.parse)
            
     def parseDrugItem(self, response):
         name_retail_container = response.css('div.even::text')
