@@ -22,11 +22,18 @@ class PostsSpider(scrapy.Spider):
         name_retail = ""
         if name_retail_container:
             name_retail = name_retail_container[1].get()
+            
+        name_scientific_container = response.css('div.odd::text')
+        name_scientific = ""
+        if name_scientific_container:
+            name_scientific = name_scientific_container[3].get()
+            
+            
         yield {
             'img': response.css('img.img-fluid::attr(src)').get(),
             'name': response.css('div.mid-snipp h1::text').get(),
             'name_retail': name_retail,
-            'name_scientific': response.css('div.odd::text')[3].get(),
+            'name_scientific': name_scientific,
             'price': response.css('p.m-price::text').get(),
             'desc_ar': response.css('div#arabic-desc::text').getall(),
             'desc_en': response.css('div#english-desc::text').getall()
