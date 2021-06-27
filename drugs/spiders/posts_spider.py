@@ -28,6 +28,10 @@ class PostsSpider(scrapy.Spider):
         name_scientific = ""
         if name_scientific_container:
             name_scientific = name_scientific_container[3].get()
+
+        producers = ""
+        for producer in response.css('div.even a::text'):
+            producers=producers+ producer.get()
             
             
         yield {
@@ -37,13 +41,7 @@ class PostsSpider(scrapy.Spider):
             'name_scientific': name_scientific,
             'price': response.css('p.m-price::text').get(),
             'desc_ar': response.css('div#arabic-desc::text').getall(),
-            'desc_en': response.css('div#english-desc::text').getall()
-        }
-        producers = ""
-        for producer in response.css('div.even a::text'):
-            producers=producers+ producer.get()
-            
-        yield {
+            'desc_en': response.css('div#english-desc::text').getall(),
             'manufacturers': producers
         }
                 
