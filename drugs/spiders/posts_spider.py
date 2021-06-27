@@ -41,7 +41,7 @@ class PostsSpider(scrapy.Spider):
         }
         producers = ""
         for producer in response.css('div.even a::text'):
-            producers=producers+ producer
+            producers=producers+ producer.get()
             
         yield {
             'manufacturers': producers
